@@ -1,38 +1,39 @@
 package com.example.examples
 
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.viewModels
-import androidx.compose.material.Snackbar
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.examples.databinding.ActivityMainBinding
 import com.example.examples.ui.MainViewModel
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 
-import com.google.android.material.snackbar.Snackbar;
+class MainActivity : AppCompatActivity() {
 
-class MainActivity : ComponentActivity() {
+    private lateinit var viewModel: MainViewModel
 
-    val viewModel: MainViewModel by viewModels()
     private lateinit var binding: ActivityMainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
 
-        binding.btnShowsnackbar.setOnClickListener {
+        binding.btnShowSnackbar.setOnClickListener {
             viewModel.triggerEvent()
         }
-        lifecycleScope.launch {
+
+        lifecycleScope.launchWhenStarted {
             viewModel.eventFlow.collect { event ->
-                when (event) {
+                when(event) {
                     is MainViewModel.UiEvent.ErrorEvent -> {
                         Snackbar.make(binding.root, event.message, Snackbar.LENGTH_LONG).show()
                     }
                 }
             }
         }
+
     }
 }
