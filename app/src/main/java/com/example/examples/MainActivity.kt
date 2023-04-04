@@ -2,42 +2,37 @@ package com.example.examples
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.examples.ui.theme.ExamplesTheme
+import androidx.activity.viewModels
+import androidx.compose.material.Snackbar
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.lifecycleScope
+import com.example.examples.databinding.ActivityMainBinding
+import com.example.examples.ui.MainViewModel
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
+
+import com.google.android.material.snackbar.Snackbar;
 
 class MainActivity : ComponentActivity() {
+
+    val viewModel: MainViewModel by viewModels()
+    private lateinit var binding: ActivityMainBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent {
-            ExamplesTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
-                ) {
-                    Greeting("Android")
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        binding.btnShowsnackbar.setOnClickListener {
+            viewModel.triggerEvent()
+        }
+        lifecycleScope.launch {
+            viewModel.eventFlow.collect { event ->
+                when (event) {
+                    is MainViewModel.UiEvent.ErrorEvent -> {
+                        Snackbar.make(binding.root, event.message, Snackbar.LENGTH_LONG).show()
+                    }
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String) {
-    Text(text = "Hello $name!")
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    ExamplesTheme {
-        Greeting("Android")
     }
 }
