@@ -23,7 +23,7 @@ fun Navigation() {
             MainScreen(navController = navController)
         }
         composable(
-            route = Screen.DetailScreen.route + "?name={name}",
+            route = Screen.DetailScreen.route + "/{name}",
             arguments = listOf(navArgument("name") {
                 type = NavType.StringType
                 defaultValue = "Ann"
